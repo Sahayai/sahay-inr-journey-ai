@@ -1,11 +1,10 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar, Target, Plus, ArrowRight, IndianRupee, Droplet } from "lucide-react";
+import { Calendar, Target, Plus, ArrowRight, IndianRupee, Coins } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
@@ -46,6 +45,7 @@ const initialGoals = [
 const SavingsJar: React.FC<{ goal: any }> = ({ goal }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [addAmount, setAddAmount] = useState<string>("");
+  const [coins, setCoins] = useState<Array<{ id: number; left: number; size: number; delay: number }>>([]);
   
   const progress = (goal.current / goal.target) * 100;
   const fillHeight = `${progress}%`;
@@ -57,11 +57,43 @@ const SavingsJar: React.FC<{ goal: any }> = ({ goal }) => {
       return;
     }
     
+    // Generate coins animation
+    const newCoins = Array.from({ length: 5 }).map((_, index) => ({
+      id: Date.now() + index,
+      left: Math.random() * 100,
+      size: 10 + Math.random() * 10,
+      delay: Math.random() * 0.5
+    }));
+    
+    setCoins(prev => [...prev, ...newCoins]);
+    
+    // Remove coins after animation completes
+    setTimeout(() => {
+      setCoins(prev => prev.filter(coin => !newCoins.some(newCoin => newCoin.id === coin.id)));
+    }, 2000);
+    
     // In a real app, this would update the database
     toast.success(`Added ₹${amount.toLocaleString()} to ${goal.name}`);
     setIsDialogOpen(false);
     setAddAmount("");
   };
+  
+  // Random initial coins
+  useEffect(() => {
+    const initialCoins = Array.from({ length: 3 }).map((_, index) => ({
+      id: Date.now() + index,
+      left: Math.random() * 100,
+      size: 10 + Math.random() * 10,
+      delay: Math.random() * 0.5
+    }));
+    
+    setCoins(initialCoins);
+    
+    // Remove initial coins after animation
+    setTimeout(() => {
+      setCoins([]);
+    }, 2000);
+  }, []);
   
   return (
     <Card className="overflow-hidden h-full flex flex-col">
@@ -79,18 +111,7 @@ const SavingsJar: React.FC<{ goal: any }> = ({ goal }) => {
                   className={`savings-jar-fill bg-gradient-to-t ${goal.color}`} 
                   style={{ height: fillHeight }}
                 >
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <Droplet
-                      key={i}
-                      className="savings-jar-bubble opacity-70"
-                      size={10 + Math.random() * 8}
-                      style={{
-                        left: `${Math.random() * 100}%`,
-                        animationDelay: `${Math.random() * 5}s`,
-                        animationDuration: `${3 + Math.random() * 4}s`
-                      }}
-                    />
-                  ))}
+                  <div className="water-wave"></div>
                 </div>
               </div>
             </div>
@@ -101,6 +122,21 @@ const SavingsJar: React.FC<{ goal: any }> = ({ goal }) => {
                 {progress.toFixed(0)}% complete
               </div>
             </div>
+            
+            {/* Falling coins animation */}
+            {coins.map((coin) => (
+              <div
+                key={coin.id}
+                className="savings-coin"
+                style={{
+                  width: `${coin.size}px`,
+                  height: `${coin.size}px`,
+                  left: `${coin.left}%`,
+                  top: '0px',
+                  animationDelay: `${coin.delay}s`
+                }}
+              />
+            ))}
           </div>
         </div>
         
@@ -116,7 +152,7 @@ const SavingsJar: React.FC<{ goal: any }> = ({ goal }) => {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="w-full sahay-gradient-bg">
-              <IndianRupee className="h-4 w-4 mr-2" />
+              <Coins className="h-4 w-4 mr-2" />
               Add Savings
             </Button>
           </DialogTrigger>
