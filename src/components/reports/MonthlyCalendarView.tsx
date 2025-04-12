@@ -33,7 +33,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ transactions 
     return acc;
   }, {} as Record<string, number>);
 
-  // Function to determine the modifier class for a date
+  // Function to determine the class for a date based on transaction amounts
   const getDayClass = (date: Date): string => {
     const dateString = date.toISOString().split('T')[0];
     const amount = amountsByDate[dateString];
@@ -45,25 +45,29 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ transactions 
     return "";
   };
 
-  // Custom component to render days with transaction info
-  const DayWithTransaction = (props: React.ComponentProps<typeof Calendar.Day>) => {
-    const date = props.date;
-    if (!date) return null;
-    
-    const dateString = date.toISOString().split('T')[0];
-    const amount = amountsByDate[dateString];
-    const className = getDayClass(date);
-    
-    return (
-      <div className={`w-full h-full p-2 flex flex-col items-center ${className}`}>
-        <div {...props}>{date.getDate()}</div>
-        {amount !== undefined && (
-          <div className="text-xs mt-1">
-            {amount > 0 ? '+' : ''}₹{Math.abs(amount).toLocaleString()}
-          </div>
-        )}
-      </div>
-    );
+  // Custom render function for each day cell
+  const renderDay = (day: React.ComponentProps<typeof Calendar>["components"]["day"]) => {
+    return function DayWithTransaction(props: any) {
+      const date = props.date;
+      if (!date) return null;
+      
+      const dateString = date.toISOString().split('T')[0];
+      const amount = amountsByDate[dateString];
+      const className = getDayClass(date);
+      
+      return (
+        <div className={`w-full h-full p-2 flex flex-col items-center ${className}`}>
+          {/* Render the original day component with its props */}
+          {day && React.cloneElement(day(props), {})}
+          {/* Add transaction amount if exists */}
+          {amount !== undefined && (
+            <div className="text-xs mt-1">
+              {amount > 0 ? '+' : ''}₹{Math.abs(amount).toLocaleString()}
+            </div>
+          )}
+        </div>
+      );
+    };
   };
 
   return (
@@ -80,10 +84,10 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ transactions 
               }
             }}
             modifiersClassNames={{
-              highlighted: (date) => getDayClass(date)
+              highlighted: "bg-opacity-20" // Using a string value as required
             }}
             components={{
-              Day: DayWithTransaction
+              day: renderDay(undefined)
             }}
           />
         </CardContent>
