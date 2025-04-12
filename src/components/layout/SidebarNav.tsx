@@ -11,7 +11,8 @@ import {
   Menu, 
   X,
   IndianRupee,
-  MessageSquareText
+  MessageSquareText,
+  PieChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const navItems: NavItem[] = [
   { path: '/expenses', label: 'Expenses', icon: IndianRupee },
   { path: '/budgets', label: 'Budgets', icon: BarChart3 },
   { path: '/goals', label: 'Goals', icon: Target },
+  { path: '/reports', label: 'Reports', icon: PieChart },
   { path: '/cards', label: 'Cards', icon: CreditCard },
   { path: '/circles', label: 'Circles', icon: Users },
   { path: '/ai-chat', label: 'AI Chat', icon: MessageSquareText },

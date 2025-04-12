@@ -33,9 +33,9 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ transactions 
     return acc;
   }, {} as Record<string, number>);
 
-  // Function to determine the modifier class for a date based on transaction amounts
-  const getDayClassNames = (day: Date) => {
-    const dateString = day.toISOString().split('T')[0];
+  // Function to determine the modifier class for a date
+  const getDayClass = (date: Date): string => {
+    const dateString = date.toISOString().split('T')[0];
     const amount = amountsByDate[dateString];
     
     if (amount === undefined) return "";
@@ -45,16 +45,23 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ transactions 
     return "";
   };
 
-  // Function to add transaction info to day cells
-  const renderDayContent = (day: Date) => {
-    const dateString = day.toISOString().split('T')[0];
-    const amount = amountsByDate[dateString];
+  // Custom component to render days with transaction info
+  const DayWithTransaction = (props: React.ComponentProps<typeof Calendar.Day>) => {
+    const date = props.date;
+    if (!date) return null;
     
-    if (amount === undefined) return null;
+    const dateString = date.toISOString().split('T')[0];
+    const amount = amountsByDate[dateString];
+    const className = getDayClass(date);
     
     return (
-      <div className="text-xs mt-1">
-        {amount > 0 ? '+' : ''}₹{Math.abs(amount).toLocaleString()}
+      <div className={`w-full h-full p-2 flex flex-col items-center ${className}`}>
+        <div {...props}>{date.getDate()}</div>
+        {amount !== undefined && (
+          <div className="text-xs mt-1">
+            {amount > 0 ? '+' : ''}₹{Math.abs(amount).toLocaleString()}
+          </div>
+        )}
       </div>
     );
   };
@@ -66,14 +73,17 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ transactions 
           <Calendar
             mode="single"
             className="rounded-md border"
-            dayClassName={getDayClassNames}
+            modifiers={{
+              highlighted: (date) => {
+                const dateString = date.toISOString().split('T')[0];
+                return amountsByDate[dateString] !== undefined;
+              }
+            }}
+            modifiersClassNames={{
+              highlighted: (date) => getDayClass(date)
+            }}
             components={{
-              Day: ({ day, ...props }) => (
-                <div className="w-full h-full p-2 flex flex-col items-center">
-                  <div {...props}>{day.getDate()}</div>
-                  {renderDayContent(day)}
-                </div>
-              ),
+              Day: DayWithTransaction
             }}
           />
         </CardContent>
