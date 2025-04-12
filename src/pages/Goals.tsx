@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar, Target, Plus, ArrowRight, IndianRupee } from "lucide-react";
+import { Calendar, Target, Plus, ArrowRight, IndianRupee, Droplet } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
@@ -70,22 +70,41 @@ const SavingsJar: React.FC<{ goal: any }> = ({ goal }) => {
         <CardDescription>{goal.description}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
-        <div className="savings-jar mb-4">
-          <div 
-            className={`savings-jar-fill bg-gradient-to-t ${goal.color}`} 
-            style={{ '--fill-height': fillHeight } as React.CSSProperties}
-          />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-            <div className="text-xl font-bold">₹{goal.current.toLocaleString()}</div>
-            <div className="text-sm text-gray-500">of ₹{goal.target.toLocaleString()}</div>
-            <Progress value={progress} className="w-full mt-2" />
-            <div className="mt-2 text-sm">
-              {progress.toFixed(0)}% complete
+        <div className="relative w-full flex justify-center mb-4">
+          <div className="savings-jar-container">
+            <div className="savings-jar-outline">
+              <div className="savings-jar-neck" />
+              <div className="savings-jar-body">
+                <div 
+                  className={`savings-jar-fill bg-gradient-to-t ${goal.color}`} 
+                  style={{ height: fillHeight }}
+                >
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <Droplet
+                      key={i}
+                      className="savings-jar-bubble opacity-70"
+                      size={10 + Math.random() * 8}
+                      style={{
+                        left: `${Math.random() * 100}%`,
+                        animationDelay: `${Math.random() * 5}s`,
+                        animationDuration: `${3 + Math.random() * 4}s`
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+              <div className="text-xl font-bold">₹{goal.current.toLocaleString()}</div>
+              <div className="text-sm text-gray-500">of ₹{goal.target.toLocaleString()}</div>
+              <div className="mt-2 text-sm font-semibold">
+                {progress.toFixed(0)}% complete
+              </div>
             </div>
           </div>
         </div>
         
-        <div className="flex justify-between text-sm text-gray-500 mt-2">
+        <div className="flex justify-between text-sm text-gray-500 mt-6">
           <div className="flex items-center">
             <Calendar className="h-4 w-4 mr-1" />
             <span>By {goal.deadline}</span>
