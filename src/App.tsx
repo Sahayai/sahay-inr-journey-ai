@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Goals from "./pages/Goals";
 import Expenses from "./pages/Expenses";
 import AIChat from "./pages/AIChat";
+import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/expenses" element={<MainLayout><Expenses /></MainLayout>} />
           <Route path="/goals" element={<MainLayout><Goals /></MainLayout>} />
           <Route path="/ai-chat" element={<MainLayout><AIChat /></MainLayout>} />
+          <Route path="/reports" element={<MainLayout><Reports /></MainLayout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
